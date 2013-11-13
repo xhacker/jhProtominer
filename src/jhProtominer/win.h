@@ -1,9 +1,10 @@
 #ifndef __WIN_H
 #define __WIN_H
 
+// Includes
+
 #include <stdlib.h>
 #include <string.h>
-#include <pthread.h>
 #include <sys/signal.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -15,12 +16,15 @@
 #include <netdb.h>
 #include <time.h>
 #include <malloc.h>
-
+#include<thread>
+#include<mutex>
 
 typedef void *LPVOID;
 typedef uint32_t *LPDWORD;
 
+// Socket related
 typedef int SOCKET;
+
 typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 typedef fd_set FD_SET;
@@ -33,19 +37,16 @@ typedef void *WSADATA;
 #define SOCKET_ERROR -1
 
 #define strcpy_s(dst, n, src) \
-    strncpy((dst), (src), (n))
+strncpy((dst), (src), (n))
 
 #define RtlZeroMemory(s, size)\
-    memset((s), 0, (size))
+memset((s), 0, (size))
 
 #define RtlCopyMemory(dest, src, size)\
-    memcpy((dest), (src), (size))
+memcpy((dest), (src), (size))
 
-#define max(a, b) \
-    ((a)>(b)?(a):(b))
-
-#define min(a, b) \
-    ((a)<(b)?(a):(b))
+#define min(a, b)  (((a) < (b)) ? (a) : (b))
+#define max(a, b)  (((a) > (b)) ? (a) : (b))
 
 #define FIONBIO 0
 
@@ -57,9 +58,10 @@ fcntl(socket, F_SETFL, O_NONBLOCK)
 
 #define closesocket(fd) close(fd)
 
+// Thread related
+
 typedef struct {
-    pthread_mutex_t mutex;
-    pthread_mutexattr_t attr;
+    std::mutex mutex;
 } CRITICAL_SECTION;
 
 void InitializeCriticalSection(CRITICAL_SECTION *s);
@@ -70,7 +72,9 @@ void LeaveCriticalSection(CRITICAL_SECTION *s);
 
 typedef void *(*LPTHREAD_START_ROUTINE)(void *);
 
-void CreateThread(LPVOID ig1, size_t ig2, LPTHREAD_START_ROUTINE func, LPVOID arg, uint32_t ig3,  LPDWORD tid);
+void CreateThread(LPVOID ig1, size_t ig2, LPTHREAD_START_ROUTINE func, LPVOID arg, uint32_t ig3, LPDWORD tid);
+
+
 
 #define __declspec(x) __##x
 
@@ -80,7 +84,6 @@ void CreateThread(LPVOID ig1, size_t ig2, LPTHREAD_START_ROUTINE func, LPVOID ar
 
 #define GetTickCount() (uint32) (time(NULL) - 1383638888) * 1000 // A quick hack for time_t overflow
 
-
 #define _strdup strdup
 
 typedef struct {
@@ -88,14 +91,14 @@ typedef struct {
 } SYSTEM_INFO;
 
 #define GetSystemInfo(ps) \
-    (ps)->dwNumberOfProcessors = sysconf(_SC_NPROCESSORS_ONLN)
+(ps)->dwNumberOfProcessors = sysconf(_SC_NPROCESSORS_ONLN)
 
 #define GetCurrentProcess() getpid()
 
 #define BELOW_NORMAL_PRIORITY_CLASS 15
 
 #define SetPriorityClass(pid, priority) \
-    nice(priority)
+nice(priority)
 
 
 #endif
