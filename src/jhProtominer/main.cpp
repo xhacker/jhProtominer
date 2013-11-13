@@ -70,7 +70,7 @@ void jhProtominer_submitShare(minerProtosharesBlock_t* block)
 	LeaveCriticalSection(&cs_xptClient);
 }
 
-int jhProtominer_minerThread(int threadIndex)
+int jhProtominer_minerThread(int memoryMode)
 {
 	while( true )
 	{
@@ -105,7 +105,7 @@ int jhProtominer_minerThread(int threadIndex)
 			continue;
 		}
 		// valid work data present, start mining
-		switch( minerSettings.protoshareMemoryMode )
+		switch( memoryMode )
 		{
 		case PROTOSHARE_MEM_1024:
 			protoshares_process_1024(&minerProtosharesBlock);
@@ -410,7 +410,7 @@ int main(int argc, char** argv)
 	SYSTEM_INFO sysinfo;
 	GetSystemInfo( &sysinfo );
 	commandlineInput.numThreads = sysinfo.dwNumberOfProcessors;
-	commandlineInput.numThreads = min(max(commandlineInput.numThreads, 1), 4);
+	commandlineInput.numThreads = min(max(commandlineInput.numThreads, 1), 8);
 	jhProtominer_parseCommandline(argc, argv);
 	minerSettings.protoshareMemoryMode = commandlineInput.ptsMemoryMode;
 	printf("\xC9\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBB\n");
@@ -421,6 +421,11 @@ int main(int argc, char** argv)
 	printf("Launching miner...\n");
 	uint32 mbTable[] = {1024,512,256,128,32,8};
 	printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
+    if( commandlineInput.numThreads != 8){
+        puts("8 threads required");
+        exit(-1);
+    }
+
 	printf("Using %d threads\n", commandlineInput.numThreads);
 	// set priority to below normal
 	SetPriorityClass(GetCurrentProcess(), BELOW_NORMAL_PRIORITY_CLASS);
@@ -452,11 +457,10 @@ int main(int argc, char** argv)
 	minerSettings.requestTarget.authUser = commandlineInput.workername;//"jh00.pts_1";
 	minerSettings.requestTarget.authPass = commandlineInput.workerpass;//"x";
 	// start miner threads
-	for(uint32 i=0; i<commandlineInput.numThreads; i++)
-		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)0, 0, NULL);
-	/*CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)0, 0, NULL);
-	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)0, 0, NULL);
-	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)0, 0, NULL);*/
+	for(uint32 i=0; i<4; i++)
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)PROTOSHARE_MEM_1024, 0, NULL);
+	for(uint32 i=0; i<4; i++)
+		CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)jhProtominer_minerThread, (LPVOID)PROTOSHARE_MEM_512, 0, NULL);
 	// enter work management loop
 	jhProtominer_xptQueryWorkLoop();
 	return 0;
