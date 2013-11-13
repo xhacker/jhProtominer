@@ -103,6 +103,12 @@ int jhProtominer_minerThread(int threadIndex)
 		// valid work data present, start mining
 		switch( minerSettings.protoshareMemoryMode )
 		{
+		case PROTOSHARE_MEM_4096:
+			protoshares_process_4096(&minerProtosharesBlock);
+			break;
+		case PROTOSHARE_MEM_2048:
+			protoshares_process_2048(&minerProtosharesBlock);
+			break;
 		case PROTOSHARE_MEM_1024:
 			protoshares_process_1024(&minerProtosharesBlock);
 			break;
@@ -355,6 +361,14 @@ void jhProtominer_parseCommandline(int argc, char **argv)
 			}
 			cIdx++;
 		}
+		else if( memcmp(argument, "-m4096", 7)==0 )
+		{
+			commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_4096;
+		}
+		else if( memcmp(argument, "-m2048", 7)==0 )
+		{
+			commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_2048;
+		}
 		else if( memcmp(argument, "-m1024", 7)==0 )
 		{
 			commandlineInput.ptsMemoryMode = PROTOSHARE_MEM_1024;
@@ -415,7 +429,7 @@ int main(int argc, char** argv)
 	printf("\xBA  http://ypool.net                                \xBA\n");
 	printf("\xC8\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xCD\xBC\n");
 	printf("Launching miner...\n");
-	uint32 mbTable[] = {1024,512,256,128,32,8};
+	uint32 mbTable[] = {4096,2048,1024,512,256,128,32,8};
 	printf("Using %d megabytes of memory per thread\n", mbTable[min(commandlineInput.ptsMemoryMode,(sizeof(mbTable)/sizeof(mbTable[0])))]);
 	printf("Using %d threads\n", commandlineInput.numThreads);
 	// set priority to below normal
