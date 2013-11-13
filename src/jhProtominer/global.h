@@ -38,11 +38,12 @@ typedef struct
 
 extern minerSettings_t minerSettings;
 
-#define PROTOSHARE_MEM_512		(0)
-#define PROTOSHARE_MEM_256		(1)
-#define PROTOSHARE_MEM_128		(2)
-#define PROTOSHARE_MEM_32		(3)
-#define PROTOSHARE_MEM_8		(4)
+#define PROTOSHARE_MEM_1024		(0)
+#define PROTOSHARE_MEM_512		(1)
+#define PROTOSHARE_MEM_256		(2)
+#define PROTOSHARE_MEM_128		(3)
+#define PROTOSHARE_MEM_32		(4)
+#define PROTOSHARE_MEM_8		(5)
 
 // block data struct
 
