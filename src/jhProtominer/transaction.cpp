@@ -37,13 +37,13 @@ void bitclient_generateTxHash(uint32 userExtraNonceLength, uint8* userExtraNonce
 	uint8* transactionData = (uint8*)streamEx_map(streamTXData, &transactionDataLength);
 	// special case, we can use the hash of the transaction
 	uint8 hashOut[32];
-	sha256_ctx sctx;
-	sha256_init(&sctx);
-	sha256_update(&sctx, transactionData, transactionDataLength);
-	sha256_final(&sctx, hashOut);
-	sha256_init(&sctx);
-	sha256_update(&sctx, hashOut, 32);
-	sha256_final(&sctx, txHash);
+	sph_sha512_context sctx;
+	sph_sha256_init(&sctx);
+	sph_sha256(&sctx, transactionData, transactionDataLength);
+	sph_sha256_close(&sctx, hashOut);
+	sph_sha256_init(&sctx);
+	sph_sha256(&sctx, hashOut, 32);
+	sph_sha256_close(&sctx, txHash);
 	free(transactionData);
 	stream_destroy(streamTXData);
 }
@@ -103,17 +103,19 @@ void bitclient_calculateMerkleRoot(uint8* txHashes, uint32 numberOfTxHashes, uin
 				hashReadIndex++;
 				return;
 			}
+			
+			
 			for(uint32 i=0; i<layerSize[f]; i += 2)
 			{
 				uint8 hashOut[32];
-				sha256_ctx sha256_ctx;
-				sha256_init(&sha256_ctx);
-				sha256_update(&sha256_ctx, hashData+(hashReadIndex*32), 32*2);
+				sph_sha512_context sph_sha512_context;
+				sph_sha256_init(&sph_sha512_context);
+				sph_sha256(&sph_sha512_context, hashData+(hashReadIndex*32), 32*2);
 				hashReadIndex += 2;
-				sha256_final(&sha256_ctx, hashOut);
-				sha256_init(&sha256_ctx);
-				sha256_update(&sha256_ctx, hashOut, 32);
-				sha256_final(&sha256_ctx, hashData+(hashCount*32));
+				sph_sha256_close(&sph_sha512_context, hashOut);
+				sph_sha256_init(&sph_sha512_context);
+				sph_sha256(&sph_sha512_context, hashOut, 32);
+				sph_sha256_close(&sph_sha512_context, hashData+(hashCount*32));
 				hashCount++;
 				layerSize[f+1]++;
 			}

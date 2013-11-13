@@ -25,7 +25,9 @@ typedef struct
 #include"xptServer.h"
 #include"xptClient.h"
 
-#include"sha2.h"
+extern "C" {
+#include"sph_sha2.h"
+}
 
 #include"transaction.h"
 
