@@ -120,13 +120,13 @@ void protoshares_process_4096(minerProtosharesBlock_t* block)
 {
 	// generate mid hash using sha256 (header hash)
 	uint8 midHash[32];
-	sha256_ctx c256;
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)block, 80);
-	sha256_final(&c256, midHash);
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)midHash, 32);
-	sha256_final(&c256, midHash);
+	sph_sha256_context c256;
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)block, 80);
+	sph_sha256_close(&c256, midHash);
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)midHash, 32);
+	sph_sha256_close(&c256, midHash);
 	// init collision map
 	if( __collisionMap == NULL )
 		__collisionMap = (uint32*)malloc(sizeof(uint32)*COLLISION_TABLE_SIZE);
@@ -135,30 +135,32 @@ void protoshares_process_4096(minerProtosharesBlock_t* block)
 	// start search
 	// uint8 midHash[64];
 	uint8 tempHash[32+4];
-	sha512_ctx c512;
+	sph_sha512_context c512;
 	uint64 resultHashStorage[8*CACHED_HASHES];
 	memcpy(tempHash+4, midHash, 32);
 	for(uint32 n=0; n<MAX_MOMENTUM_NONCE; n += BIRTHDAYS_PER_HASH * CACHED_HASHES)
 	{
 		// generate hash (birthdayA)
-		//sha512_init(&c512);
+		//sph_sha512_init(&c512);
 		//sha512_update(&c512, tempHash, 32+4);
-		//sha512_final(&c512, (unsigned char*)resultHash);
+		//sph_sha512_close(&c512, (unsigned char*)resultHash);
 		//sha512(tempHash, 32+4, (unsigned char*)resultHash);
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
-			sha512_init(&c512);
+			sph_sha512_init(&c512);
 			*(uint32*)tempHash = n+m*8;
-			sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
+			sph_sha512(&c512, tempHash, 32+4);
+			sph_sha512_close(&c512, (unsigned char*)(resultHashStorage+8*m));
+			//sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
 		}
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
 			uint64* resultHash = resultHashStorage + 8*m;
 			uint32 i = n + m*8;
 			//uint64 resultHash2[8];
-			//sha512_init(&c512);
+			//sph_sha512_init(&c512);
 			//sha512_update(&c512, tempHash, 32+4);
-			//sha512_final(&c512, (unsigned char*)resultHash);
+			//sph_sha512_close(&c512, (unsigned char*)resultHash);
 			//sha512(tempHash, 32+4, (unsigned char*)resultHash2);
 			//if( memcmp(resultHash, resultHash2, sizeof(resultHash2)) )
 			//	__debugbreak();
@@ -198,13 +200,13 @@ void protoshares_process_2048(minerProtosharesBlock_t* block)
 {
 	// generate mid hash using sha256 (header hash)
 	uint8 midHash[32];
-	sha256_ctx c256;
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)block, 80);
-	sha256_final(&c256, midHash);
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)midHash, 32);
-	sha256_final(&c256, midHash);
+	sph_sha256_context c256;
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)block, 80);
+	sph_sha256_close(&c256, midHash);
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)midHash, 32);
+	sph_sha256_close(&c256, midHash);
 	// init collision map
 	if( __collisionMap == NULL )
 		__collisionMap = (uint32*)malloc(sizeof(uint32)*COLLISION_TABLE_SIZE);
@@ -213,30 +215,32 @@ void protoshares_process_2048(minerProtosharesBlock_t* block)
 	// start search
 	// uint8 midHash[64];
 	uint8 tempHash[32+4];
-	sha512_ctx c512;
+	sph_sha512_context c512;
 	uint64 resultHashStorage[8*CACHED_HASHES];
 	memcpy(tempHash+4, midHash, 32);
 	for(uint32 n=0; n<MAX_MOMENTUM_NONCE; n += BIRTHDAYS_PER_HASH * CACHED_HASHES)
 	{
 		// generate hash (birthdayA)
-		//sha512_init(&c512);
+		//sph_sha512_init(&c512);
 		//sha512_update(&c512, tempHash, 32+4);
-		//sha512_final(&c512, (unsigned char*)resultHash);
+		//sph_sha512_close(&c512, (unsigned char*)resultHash);
 		//sha512(tempHash, 32+4, (unsigned char*)resultHash);
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
-			sha512_init(&c512);
+			sph_sha512_init(&c512);
 			*(uint32*)tempHash = n+m*8;
-			sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
+			sph_sha512(&c512, tempHash, 32+4);
+			sph_sha512_close(&c512, (unsigned char*)(resultHashStorage+8*m));
+			//sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
 		}
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
 			uint64* resultHash = resultHashStorage + 8*m;
 			uint32 i = n + m*8;
 			//uint64 resultHash2[8];
-			//sha512_init(&c512);
+			//sph_sha512_init(&c512);
 			//sha512_update(&c512, tempHash, 32+4);
-			//sha512_final(&c512, (unsigned char*)resultHash);
+			//sph_sha512_close(&c512, (unsigned char*)resultHash);
 			//sha512(tempHash, 32+4, (unsigned char*)resultHash2);
 			//if( memcmp(resultHash, resultHash2, sizeof(resultHash2)) )
 			//	__debugbreak();
@@ -276,13 +280,13 @@ void protoshares_process_1024(minerProtosharesBlock_t* block)
 {
 	// generate mid hash using sha256 (header hash)
 	uint8 midHash[32];
-	sha256_ctx c256;
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)block, 80);
-	sha256_final(&c256, midHash);
-	sha256_init(&c256);
-	sha256_update(&c256, (unsigned char*)midHash, 32);
-	sha256_final(&c256, midHash);
+	sph_sha256_context c256;
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)block, 80);
+	sph_sha256_close(&c256, midHash);
+	sph_sha256_init(&c256);
+	sph_sha256(&c256, (unsigned char*)midHash, 32);
+	sph_sha256_close(&c256, midHash);
 	// init collision map
 	if( __collisionMap == NULL )
 		__collisionMap = (uint32*)malloc(sizeof(uint32)*COLLISION_TABLE_SIZE);
@@ -291,30 +295,32 @@ void protoshares_process_1024(minerProtosharesBlock_t* block)
 	// start search
 	// uint8 midHash[64];
 	uint8 tempHash[32+4];
-	sha512_ctx c512;
+	sph_sha512_context c512;
 	uint64 resultHashStorage[8*CACHED_HASHES];
 	memcpy(tempHash+4, midHash, 32);
 	for(uint32 n=0; n<MAX_MOMENTUM_NONCE; n += BIRTHDAYS_PER_HASH * CACHED_HASHES)
 	{
 		// generate hash (birthdayA)
-		//sha512_init(&c512);
+		//sph_sha512_init(&c512);
 		//sha512_update(&c512, tempHash, 32+4);
-		//sha512_final(&c512, (unsigned char*)resultHash);
+		//sph_sha512_close(&c512, (unsigned char*)resultHash);
 		//sha512(tempHash, 32+4, (unsigned char*)resultHash);
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
-			sha512_init(&c512);
+			sph_sha512_init(&c512);
 			*(uint32*)tempHash = n+m*8;
-			sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
+			sph_sha512(&c512, tempHash, 32+4);
+			sph_sha512_close(&c512, (unsigned char*)(resultHashStorage+8*m));
+			//sha512_update_final(&c512, tempHash, 32+4, (unsigned char*)(resultHashStorage+8*m));
 		}
 		for(uint32 m=0; m<CACHED_HASHES; m++)
 		{
 			uint64* resultHash = resultHashStorage + 8*m;
 			uint32 i = n + m*8;
 			//uint64 resultHash2[8];
-			//sha512_init(&c512);
+			//sph_sha512_init(&c512);
 			//sha512_update(&c512, tempHash, 32+4);
-			//sha512_final(&c512, (unsigned char*)resultHash);
+			//sph_sha512_close(&c512, (unsigned char*)resultHash);
 			//sha512(tempHash, 32+4, (unsigned char*)resultHash2);
 			//if( memcmp(resultHash, resultHash2, sizeof(resultHash2)) )
 			//	__debugbreak();
