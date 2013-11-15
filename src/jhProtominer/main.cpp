@@ -40,7 +40,7 @@ uint32 miningStartTime = 0;
 
 void jhProtominer_submitShare(minerProtosharesBlock_t* block)
 {
-	printf("Share found!\n");
+	printf("+");
 	EnterCriticalSection(&cs_xptClient);
 	if( xptClient == NULL )
 	{
@@ -202,7 +202,7 @@ void jhProtominer_xptQueryWorkLoop()
 				{
 					collisionsPerMinute = (double)totalCollisionCount / (double)passedSeconds * 60.0;
 				}
-				printf("collisions/min: %.4lf Shares total: %d\n", collisionsPerMinute, totalShareCount);
+				printf("\n%.2lf hashes/m;  %d shares.\n", collisionsPerMinute, totalShareCount);
 			}
 			timerPrintDetails = currentTick + 8000;
 		}
